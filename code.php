@@ -54,16 +54,23 @@ elseif( ! class_exists( 'Show_Pro_Posts' ) ){
 					'posts_per_page' => 10,
 					'post_type' => 'post',
 					'randomize' => false,
-					'include_main_site' => false
+					'include_main_site' => false,
+					'pro_level' => 'all'
 					);
 			
 			extract(shortcode_atts($defaults, $atts));
 			
 			$posts = $sites = array();
 			
-			$levels = get_site_option( 'psts_levels' );
+			if( $pro_level == 'all' ){
+				$levels = get_site_option( 'psts_levels' );
+			}
+			else{
+				$levels = array( $pro_level => 1 );
+			}
+			
 			foreach( $levels as $key => $value ){
-				$sql = 'SELECT * from ' . $this->db->base_prefix . 'pro_sites';
+				$sql = 'SELECT * from ' . $this->db->base_prefix . "pro_sites where level = '". $key ."'";
 				$sites = $this->db->get_results( $sql, OBJECT );
 			}
 			
@@ -75,6 +82,7 @@ elseif( ! class_exists( 'Show_Pro_Posts' ) ){
 			
 			foreach( $sites as $site ){
 				if( $site->blog_ID == 0 ) continue;
+				if( ! is_pro_site( $site->blog_ID ) ) continue;
 				
 				$sql = "SELECT * from " . $this->db->base_prefix . "network_posts where BLOG_ID = '". $site->blog_ID ."' AND post_type = '". $post_type ."' LIMIT 0, " . $posts_per_page;
 				$subsite_posts = $this->db->get_results( $sql, OBJECT );
@@ -136,5 +144,5 @@ elseif( ! class_exists( 'Show_Pro_Posts' ) ){
 		<?php
 	}
 }else{
-	echo 'There is a incompatibility issue, please run a conflict test.';
+	echo 'There is a compatibility issue, please run a conflict test.';
 }
