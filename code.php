@@ -136,5 +136,5 @@ elseif( ! class_exists( 'Show_Pro_Posts' ) ){
 		<?php
 	}
 }else{
-	echo 'There is a compatibility issue, please run a conflict test.';
+	echo 'There is a incompatibility issue, please run a conflict test.';
 }
